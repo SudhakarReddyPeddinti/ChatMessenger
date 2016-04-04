@@ -1,0 +1,8 @@
+#Phase - 1:
+ 
+GOAL: Simple communication setup using streaming and sockets
+
+Functions: Client establishes connection with the server and both echo messages that are typed in the clients' message box.
+ 
+
+
