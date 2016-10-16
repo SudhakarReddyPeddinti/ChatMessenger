@@ -1,0 +1,60 @@
+import java.io.PrintStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class MultiThreadChatClient implements Runnable {
+
+  private static Socket clientSocket = null;
+  private static PrintStream outStream = null;
+  private static BufferedReader inStream = null;
+
+  private static BufferedReader inputLine = null;
+  private static boolean closed = false;
+  
+  public static void main(String[] args) {
+    try {
+      clientSocket = new Socket("localhost", 4567);
+      inputLine = new BufferedReader(new InputStreamReader(System.in));
+      outStream = new PrintStream(clientSocket.getOutputStream());
+      inStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    } catch (UnknownHostException e) {
+      System.err.println("Host unknown");
+    } catch (IOException e) {
+      System.err.println("Couldn't estanlish connection to the host");
+    }
+    if (clientSocket != null && outStream != null && inStream != null) {
+      try {
+
+        new Thread(new MultiThreadChatClient()).start();
+        while (!closed) {
+          outStream.println(inputLine.readLine().trim());
+        }
+        outStream.close();
+        inStream.close();
+        clientSocket.close();
+      } catch (IOException e) {
+        System.err.println("IOException:  " + e);
+      }
+    }
+  }
+
+  public void run() {
+    String responseLine;
+    try {
+      while ((responseLine = inStream.readLine()) != null) {
+        System.out.println(responseLine);
+        if (responseLine.indexOf("Bye") != -1)
+          break;
+      }
+      closed = true;
+    } catch (IOException e) {
+      System.err.println("IOException:  " + e);
+    }
+  }
+}
+
+
+

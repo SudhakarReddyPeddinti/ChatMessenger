@@ -1,0 +1,33 @@
+import java.io.*;
+import java.net.*;
+
+class TCPServer {
+
+	public static void main(String argv[]) throws Exception
+	{
+		String clientSentence;
+		boolean Bye =  false;
+
+		ServerSocket welcomeSocket = new ServerSocket(6789);
+
+		while(true) {
+
+			Socket connectionSocket = welcomeSocket.accept();
+
+			DataInputStream inFromClient =
+					new DataInputStream(new BufferedInputStream(connectionSocket.getInputStream()));
+			while(!Bye){
+				try{
+					clientSentence = inFromClient.readUTF();
+					System.out.println("From Client:"+clientSentence);
+					Bye = inFromClient.equals("quit");
+				}
+				catch(IOException e){
+					Bye=true;
+				}
+				welcomeSocket.close();
+			}
+		}
+	}
+}
+
